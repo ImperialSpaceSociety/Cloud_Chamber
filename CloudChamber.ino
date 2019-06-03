@@ -12,8 +12,8 @@
 
 //Define constants
 const float ADC_Scale = (5.0 / 1023.0);
-#define Temp_Target  30.0 //top plate value
-#define Temp_Tol  2.5 // From datasheet tolerance values
+const float Temp_Target = 30; //top plate value
+const float Temp_Tol = 2.5; // From datasheet tolerance values
 
 const float board_minTemp = -20;
 
@@ -55,6 +55,7 @@ float readTemp(int Pin) {
 
 void loop() {
   toc = millis();
+  // first we wait for the 
   if (abs(tic - toc) < updateDelay) {
     // pass
   } else {
@@ -65,11 +66,9 @@ void loop() {
     float extern2 = readTemp(ExternTemp2);
 
     #if DEBUG
-      Serial.print(board);
-      Serial.print("\t"); 
-      Serial.print(extern1);
-      Serial.print("\t"); 
-      Serial.println(extern2);
+      Serial.print(board - board_minTemp);
+      Serial.print("\t");
+      Serial.println(extern1-Temp_Target);
     #endif
     
     // if the viability conditions are met
@@ -80,11 +79,6 @@ void loop() {
 
     //Condition 2 temperature sensor 1 is bad
     } else if (extern1 - Temp_Target < Temp_Tol) {
-      digitalWrite(PowerCtrl, LOW); // Start heating
-      digitalWrite(LED_BUILTIN, HIGH);
-
-    //Condition 3 temperature sensor 2 is bad
-    } else if (extern2 - Temp_Target < Temp_Tol) {
       digitalWrite(PowerCtrl, LOW); // Start heating
       digitalWrite(LED_BUILTIN, HIGH);
       
